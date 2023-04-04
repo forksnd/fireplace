@@ -20,16 +20,20 @@ import org.openjdk.jmc.common.unit.IQuantity
 import org.openjdk.jmc.flightrecorder.JfrAttributes
 import org.openjdk.jmc.flightrecorder.jdk.JdkAttributes
 import java.awt.event.MouseEvent
+import javax.swing.BoxLayout
 import javax.swing.DefaultListModel
+import javax.swing.JComponent
 import javax.swing.JList
+import javax.swing.JPanel
 import javax.swing.JSplitPane
 
-abstract class ThreadFlamegraphView(private val jfrBinder: JFRBinder) : ViewPanel {
+abstract class ThreadFlamegraphView(protected val jfrBinder: JFRBinder) : ViewPanel {
     private var events: IItemCollection = ItemCollectionToolkit.EMPTY
     private var threadMapping: Map<String, List<IItem>> = mapOf()
     abstract override val identifier: String
     protected abstract val eventSelector: (IItemCollection) -> IItemCollection
     open val nodeWeightAttribute : IAttribute<IQuantity>? = null // e.g. JdkAttributes.SAMPLE_WEIGHT or JdkAttributes.ALLOCATION_SIZE ?
+    open val bottomCharts : JComponent? = null
 
     override val view by lazy {
         val flameGraphPane = FlameGraphPane()
@@ -61,6 +65,13 @@ abstract class ThreadFlamegraphView(private val jfrBinder: JFRBinder) : ViewPane
             }
         }
 
+        
+
+        val charts = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            add(flameGraphPane)
+            bottomCharts?.let { add(it) }
+        }
 
         jfrBinder.bindEvents(eventSelector) {
             events = it
@@ -86,8 +97,7 @@ abstract class ThreadFlamegraphView(private val jfrBinder: JFRBinder) : ViewPane
             )
         }
 
-
-        JSplitPane(JSplitPane.HORIZONTAL_SPLIT, threadList, flameGraphPane).apply {
+        JSplitPane(JSplitPane.HORIZONTAL_SPLIT, threadList, charts).apply {
             autoSize(0.2)
         }
     }

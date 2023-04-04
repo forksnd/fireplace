@@ -10,6 +10,7 @@ import org.openjdk.jmc.common.item.ItemCollectionToolkit
 import org.openjdk.jmc.common.item.ItemFilters
 import org.openjdk.jmc.common.unit.IFormatter
 import org.openjdk.jmc.common.unit.IQuantity
+import org.openjdk.jmc.common.unit.IUnit
 import org.openjdk.jmc.flightrecorder.stacktrace.FrameSeparator
 import org.openjdk.jmc.flightrecorder.stacktrace.tree.StacktraceTreeModel
 import java.lang.invoke.MethodHandles
@@ -156,3 +157,10 @@ fun <T, K> byThreads(events: IItemCollection, classifier: IAttribute<T>, subAttr
         )
 }
 
+fun Any?.quantityClampedLongValueIn(unit: IUnit): Long {
+    return (this as IQuantity).clampedLongValueIn(unit)
+}
+
+fun Any?.quantityDoubleValueIn(unit: IUnit): Double {
+    return (this as IQuantity).doubleValueIn(unit)
+}
