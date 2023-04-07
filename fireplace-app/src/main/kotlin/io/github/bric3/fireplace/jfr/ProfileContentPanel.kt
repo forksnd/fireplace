@@ -12,6 +12,7 @@ package io.github.bric3.fireplace.jfr
 import io.github.bric3.fireplace.jfr.support.JFRLoaderBinder
 import io.github.bric3.fireplace.jfr.views.appDebug.AppSystemProperties
 import io.github.bric3.fireplace.jfr.views.appDebug.AppUIManagerProperties
+import io.github.bric3.fireplace.jfr.views.butterfly.ExperimentalButterfly
 import io.github.bric3.fireplace.jfr.views.cpu.MethodCpuSample
 import io.github.bric3.fireplace.jfr.views.events.EventBrowser
 import io.github.bric3.fireplace.jfr.views.general.NativeLibraries
@@ -28,11 +29,13 @@ import javax.swing.tree.TreeSelectionModel
 
 internal class ProfileContentPanel(private val jfrBinder: JFRLoaderBinder) : JPanel(BorderLayout()) {
     private val views = buildList {
+        // TODO discover views automatically
         add(MethodCpuSample(jfrBinder))
         add(Allocations(jfrBinder))
         add(SystemProperties(jfrBinder))
         add(NativeLibraries(jfrBinder))
         add(EventBrowser(jfrBinder))
+        add(ExperimentalButterfly(jfrBinder))
 
         if (AppSystemProperties.isActive()) {
             add(AppSystemProperties())
