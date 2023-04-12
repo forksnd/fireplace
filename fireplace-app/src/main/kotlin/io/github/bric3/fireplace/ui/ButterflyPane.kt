@@ -15,7 +15,9 @@ import io.github.bric3.fireplace.core.ui.Colors
 import io.github.bric3.fireplace.flamegraph.*
 import io.github.bric3.fireplace.jfr.support.JfrFrameColorMode
 import io.github.bric3.fireplace.jfr.support.JfrFrameColorMode.BY_PACKAGE
-import io.github.bric3.fireplace.jfr.support.JfrFrameNodeConverter
+import io.github.bric3.fireplace.jfr.support.JfrFrameNodeConverter.convertButterfly
+import io.github.bric3.fireplace.jfr.support.JfrFrameNodeConverter.predecessorsWeight
+import io.github.bric3.fireplace.jfr.support.JfrFrameNodeConverter.successorsWeight
 import io.github.bric3.fireplace.jfr.tree.Node
 import io.github.bric3.fireplace.jfr.tree.StacktraceButterflyModel
 import io.github.bric3.fireplace.ui.toolkit.BalloonToolTip
@@ -145,8 +147,8 @@ class ButterflyPane : JPanel(BorderLayout()) {
     }
 
     private fun dataApplier(stacktraceButterflyModel: StacktraceButterflyModel): Consumer<ButterflyView<Node>> {
-        val predecessorsFlatFrameList = JfrFrameNodeConverter.convert(stacktraceButterflyModel.predecessorsRoot)
-        val successorsFlatFrameList = JfrFrameNodeConverter.convert(stacktraceButterflyModel.successorsRoot)
+        val predecessorsFlatFrameList = convertButterfly(stacktraceButterflyModel.predecessorsRoot, predecessorsWeight())
+        val successorsFlatFrameList = convertButterfly(stacktraceButterflyModel.successorsRoot, successorsWeight())
         val title = stacktraceButterflyModel.focusedMethod.method.methodName
         return Consumer { flameGraph ->
             val frameEquality: (a: FrameBox<Node>, b: FrameBox<Node>) -> Boolean =
@@ -246,9 +248,9 @@ class ButterflyPane : JPanel(BorderLayout()) {
                     append(frame.actualNode.frame.humanReadableShortString)
                     append("</b><br>")
                     append(desc)
-                    append("<br><hr>")
+                    append("<br><hr>Cumulative weight:")
                     append(frame.actualNode.cumulativeWeight)
-                    append(" ")
+                    append(" Weight:")
                     append(frame.actualNode.weight)
                     append("<br>BCI: ")
                     append(frame.actualNode.frame.bci ?: "N/A")
